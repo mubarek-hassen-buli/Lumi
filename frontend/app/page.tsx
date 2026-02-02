@@ -1,14 +1,28 @@
 import Link from "next/link";
 import { Sparkles, FileText, ArrowRight } from "lucide-react";
+import PixelBlast from "@/components/PixelBlast";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="px-6 h-16 flex items-center justify-between border-b">
+    <div className="flex flex-col min-h-screen relative overflow-hidden text-white">
+      <div className="fixed inset-0 -z-10 bg-black">
+        <PixelBlast 
+            variant="square" 
+            pixelSize={3} 
+            color="#8b5cf6" 
+            speed={0.3}
+            patternScale={3}
+            patternDensity={0.8}
+            edgeFade={0.5}
+            transparent={true}
+        />
+      </div>
+      <header className="px-6 h-16 flex items-center justify-between border-b border-white/10 backdrop-blur-sm">
         <div className="flex items-center gap-2 font-bold text-xl">
           <Sparkles className="w-5 h-5 text-primary" />
           <span>Lumi</span>
         </div>
+
         <div className="flex items-center gap-4">
           <Link href="/sign-in" className="text-sm font-medium hover:underline">
             Sign In
@@ -54,33 +68,34 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-muted/30 py-24 border-y">
+        <section className="bg-white/5 py-24 border-y border-white/10">
             <div className="container mx-auto px-4">
                 <div className="grid md:grid-cols-3 gap-8">
-                    <div className="bg-card p-6 rounded-xl border shadow-sm">
-                        <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4 text-primary">
+                    <div className="bg-white/5 p-6 rounded-xl border border-white/10 shadow-sm backdrop-blur-lg">
+                        <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center mb-4 text-primary">
                             <FileText className="w-5 h-5" />
                         </div>
                         <h3 className="font-semibold text-xl mb-2">Instant Drafting</h3>
-                        <p className="text-muted-foreground">Paste any text, and our AI drafts a structured contract in seconds.</p>
+                        <p className="text-white/60">Paste any text, and our AI drafts a structured contract in seconds.</p>
                     </div>
-                    <div className="bg-card p-6 rounded-xl border shadow-sm">
-                         <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4 text-primary">
+                    <div className="bg-white/5 p-6 rounded-xl border border-white/10 shadow-sm backdrop-blur-lg">
+                         <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center mb-4 text-primary">
                              <Sparkles className="w-5 h-5" />
                          </div>
                         <h3 className="font-semibold text-xl mb-2">Smart Formatting</h3>
-                        <p className="text-muted-foreground">Automatically adheres to legal structures, tone, and standard clauses.</p>
+                        <p className="text-white/60">Automatically adheres to legal structures, tone, and standard clauses.</p>
                     </div>
-                    <div className="bg-card p-6 rounded-xl border shadow-sm">
-                         <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4 text-primary">
+                    <div className="bg-white/5 p-6 rounded-xl border border-white/10 shadow-sm backdrop-blur-lg">
+                         <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center mb-4 text-primary">
                              <ArrowRight className="w-5 h-5" />
                          </div>
                         <h3 className="font-semibold text-xl mb-2">Easy Export</h3>
-                        <p className="text-muted-foreground">Edit in our rich editor and export to Markdown or PDF instantly.</p>
+                        <p className="text-white/60">Edit in our rich editor and export to Markdown or PDF instantly.</p>
                     </div>
                 </div>
             </div>
         </section>
+
       </main>
 
       <footer className="py-8 border-t text-center text-sm text-muted-foreground">

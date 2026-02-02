@@ -1,11 +1,13 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import Link from 'next/link';
-import { File, Plus, FileText, Calendar } from 'lucide-react';
+import { File, Plus, FileText, Calendar, Trash2 } from 'lucide-react';
 
 export default function DashboardPage() {
+    const queryClient = useQueryClient();
+
     const { data: documents, isLoading } = useQuery({
         queryKey: ['documents'],
         queryFn: async () => {
@@ -13,6 +15,28 @@ export default function DashboardPage() {
              return data;
         }
     });
+
+    const deleteMutation = useMutation({
+        mutationFn: async (id: number) => {
+            await api(`/api/documents/${id}`, { method: 'DELETE' });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['documents'] });
+        },
+        onError: (error) => {
+            console.error("Failed to delete document:", error);
+            alert("Failed to delete document. Please try again.");
+        }
+    });
+
+    const handleDelete = async (e: React.MouseEvent, id: number, title: string) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (confirm(`Are you sure you want to delete "${title}"?`)) {
+            deleteMutation.mutate(id);
+        }
+    };
 
     return (
         <div className="container mx-auto py-10 px-4">
@@ -48,9 +72,19 @@ export default function DashboardPage() {
                                 <div className="p-2 bg-primary/10 rounded-lg text-primary">
                                     <FileText className="w-6 h-6" />
                                 </div>
-                                <span className="text-xs font-medium px-2 py-1 bg-muted rounded-full capitalize">
-                                    {doc.type}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-medium px-2 py-1 bg-muted rounded-full capitalize">
+                                        {doc.type}
+                                    </span>
+                                    <button
+                                        onClick={(e) => handleDelete(e, doc.id, doc.title)}
+                                        disabled={deleteMutation.isPending}
+                                        className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+                                        title="Delete document"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
                              </div>
                              
                              <h3 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors line-clamp-1">

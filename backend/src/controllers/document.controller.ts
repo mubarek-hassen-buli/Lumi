@@ -79,4 +79,32 @@ app.get("/:id", authMiddleware, async (c) => {
   return c.json(doc);
 });
 
+// Delete Document
+app.delete("/:id", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const id = Number(c.req.param("id"));
+
+  if (isNaN(id)) {
+    return c.json({ error: "Invalid ID" }, 400);
+  }
+
+  // Check ownership
+  const [doc] = await db.select()
+    .from(document)
+    .where(eq(document.id, id));
+
+  if (!doc) {
+    return c.json({ error: "Document not found" }, 404);
+  }
+
+  if (doc.userId !== user.id) {
+    return c.json({ error: "Unauthorized" }, 403);
+  }
+
+  await db.delete(document)
+    .where(eq(document.id, id));
+
+  return c.json({ success: true });
+});
+
 export default app;

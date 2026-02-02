@@ -62,7 +62,24 @@ export default function Home() {
               Log In
             </Link>
           </div>
+
+          <div className="mt-24 relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-white/20 to-white/5 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+              <div className="relative bg-black rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+                  <video 
+                    autoPlay 
+                    muted 
+                    loop 
+                    playsInline 
+                    className="w-full h-auto"
+                  >
+                    <source src="/video/dashboard.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+              </div>
+          </div>
         </section>
+
 
         <section className="bg-white/[0.02] py-32 border-y border-white/10 backdrop-blur-3xl">
             <div className="container mx-auto px-4">

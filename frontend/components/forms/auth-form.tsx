@@ -5,6 +5,7 @@ import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
+import StarBorder from '@/components/StarBorder';
 
 interface AuthFormProps {
   mode: 'signin' | 'signup';
@@ -153,20 +154,23 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 <span>Remember me</span>
             </div>
 
-            <button
+            <StarBorder
+              as="button"
               type="submit"
               disabled={loading}
-              className="w-full bg-white text-black h-14 rounded-2xl font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:pointer-events-none mt-4"
+              className="w-full mt-4"
+              color="white"
+              speed="3s"
             >
               {loading ? (
-                  <span className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                  <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin inline-block align-middle" />
               ) : (
-                  <>
-                    <span>{mode === 'signin' ? 'Start your session' : 'Begin your adventure'}</span>
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="font-bold text-lg">{mode === 'signin' ? 'Start your session' : 'Begin your adventure'}</span>
                     <ArrowRight className="w-5 h-5" />
-                  </>
+                  </div>
               )}
-            </button>
+            </StarBorder>
           </form>
         </div>
 

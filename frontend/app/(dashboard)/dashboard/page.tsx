@@ -5,6 +5,8 @@ import { api } from '@/lib/api';
 import Link from 'next/link';
 import { File, Plus, FileText, Calendar, Trash2 } from 'lucide-react';
 
+import { toast } from "sonner";
+
 export default function DashboardPage() {
     const queryClient = useQueryClient();
 
@@ -18,24 +20,34 @@ export default function DashboardPage() {
 
     const deleteMutation = useMutation({
         mutationFn: async (id: number) => {
-            await api(`/api/documents/${id}`, { method: 'DELETE' });
+            const { error } = await api(`/api/documents/${id}`, { method: 'DELETE' });
+            if (error) throw error;
         },
         onSuccess: () => {
+            toast.success("Document deleted successfully");
             queryClient.invalidateQueries({ queryKey: ['documents'] });
         },
         onError: (error) => {
             console.error("Failed to delete document:", error);
-            alert("Failed to delete document. Please try again.");
+            toast.error("Failed to delete document. Please try again.");
         }
     });
 
-    const handleDelete = async (e: React.MouseEvent, id: number, title: string) => {
+    const handleDelete = (e: React.MouseEvent, id: number, title: string) => {
         e.preventDefault();
         e.stopPropagation();
         
-        if (confirm(`Are you sure you want to delete "${title}"?`)) {
-            deleteMutation.mutate(id);
-        }
+        toast(`Delete "${title}"?`, {
+            description: "This action cannot be undone.",
+            action: {
+                label: "Delete",
+                onClick: () => deleteMutation.mutate(id)
+            },
+            cancel: {
+                label: "Cancel",
+                onClick: () => {}
+            }
+        });
     };
 
     return (

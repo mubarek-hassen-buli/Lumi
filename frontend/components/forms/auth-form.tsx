@@ -11,6 +11,8 @@ interface AuthFormProps {
   mode: 'signin' | 'signup';
 }
 
+import { toast } from "sonner";
+
 export default function AuthForm({ mode }: AuthFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,10 +32,11 @@ export default function AuthForm({ mode }: AuthFormProps) {
           name,
         }, {
             onSuccess: () => {
+                toast.success("Account created successfully!");
                 router.push('/dashboard');
             },
             onError: (ctx) => {
-                alert(ctx.error.message)
+                toast.error(ctx.error.message);
             }
         });
       } else {
@@ -42,15 +45,17 @@ export default function AuthForm({ mode }: AuthFormProps) {
           password,
         }, {
             onSuccess: () => {
+                toast.success("Signed in successfully!");
                 router.push('/dashboard');
             },
             onError: (ctx) => {
-                alert(ctx.error.message)
+                toast.error(ctx.error.message);
             }
         });
       }
     } catch (error) {
       console.error(error);
+      toast.error("An unexpected error occurred.");
     } finally {
       setLoading(false);
     }

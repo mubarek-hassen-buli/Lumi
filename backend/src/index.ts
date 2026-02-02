@@ -11,7 +11,7 @@ app.use(
   cors({
     origin: ["http://localhost:3000"], // Explicitly allow Frontend
     allowHeaders: ["Content-Type", "Authorization"],
-    allowMethods: ["POST", "GET", "OPTIONS"],
+    allowMethods: ["POST", "GET", "OPTIONS", "DELETE", "PATCH"],
     exposeHeaders: ["Content-Length"],
     maxAge: 600,
     credentials: true, // Required for BetterAuth cookies

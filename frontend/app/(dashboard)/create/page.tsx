@@ -6,6 +6,8 @@ import { api } from '@/lib/api';
 import { Sparkles, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
+import { toast } from "sonner";
+
 export default function CreateDocumentPage() {
     const [content, setContent] = useState('');
     const [type, setType] = useState('contract');
@@ -26,13 +28,14 @@ export default function CreateDocumentPage() {
             });
 
             if (data) {
+                toast.success("Document generated successfully!");
                 router.push(`/editor/${data.id}`);
             } else {
-                alert("Failed to generate document");
+                toast.error("Failed to generate document");
             }
         } catch (err) {
             console.error(err);
-             alert("An error occurred");
+             toast.error("An error occurred while generating the document");
         } finally {
             setLoading(false);
         }

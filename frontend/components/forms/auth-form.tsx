@@ -4,9 +4,7 @@ import { useState } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import LiquidChrome from '@/components/LiquidChrome';
-
-
+import { Sparkles, ArrowRight, ArrowLeft } from 'lucide-react';
 
 interface AuthFormProps {
   mode: 'signin' | 'signup';
@@ -58,94 +56,162 @@ export default function AuthForm({ mode }: AuthFormProps) {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black">
-      <div className="absolute inset-0 -z-10">
-        <LiquidChrome 
-            baseColor={[0.3, 0.1, 0.6]}
-            speed={0.15}
-            amplitude={0.5}
-            interactive={true}
-        />
-      </div>
-      <div className="relative w-full max-w-md space-y-8 rounded-2xl border border-white/10 bg-black/40 p-8 shadow-2xl backdrop-blur-xl">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold tracking-tight">
-            {mode === 'signin' ? 'Sign in to your account' : 'Create an account'}
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {mode === 'signin' ? (
-              <>
-                Don't have an account?{' '}
-                <Link href="/sign-up" className="font-medium text-primary hover:text-primary/90">
-                  Sign up
-                </Link>
-              </>
-            ) : (
-              <>
-                Already have an account?{' '}
-                <Link href="/sign-in" className="font-medium text-primary hover:text-primary/90">
-                  Sign in
-                </Link>
-              </>
-            )}
-          </p>
+    <div className="flex min-h-screen bg-black text-white">
+      {/* Left Side: Form Container */}
+      <div className="flex-1 flex flex-col justify-center px-8 sm:px-12 lg:px-24 bg-topo relative z-10 border-r border-white/5">
+        <div className="absolute top-8 left-8 sm:left-12 lg:left-24">
+            <Link href="/" className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors group">
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                <span className="text-sm font-medium">Back to Home</span>
+            </Link>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          <div className="space-y-4">
-            {mode === 'signup' && (
-              <div>
-                <label htmlFor="name" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Name
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  placeholder="John Doe"
-                />
-              </div>
-            )}
-            <div>
-              <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="john@example.com"
-              />
+        <div className="max-w-md w-full mx-auto lg:mx-0">
+          <div className="mb-12">
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-8 shadow-2xl">
+                <Sparkles className="w-6 h-6 text-black" />
             </div>
-            <div>
-              <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              />
-            </div>
+            <h1 className="text-4xl md:text-5xl font-hero italic mb-3 tracking-tight">
+              {mode === 'signin' ? 'Welcome Back' : 'Join Lumi'}
+            </h1>
+            <p className="text-white/40 text-lg">
+                {mode === 'signin' 
+                  ? 'Sign in to continue your professional drafting.' 
+                  : 'Start your journey into professional AI drafting.'}
+            </p>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-          >
-            {loading ? 'Loading...' : mode === 'signin' ? 'Sign in' : 'Sign up'}
-          </button>
-        </form>
+          <div className="flex p-1 bg-white/5 rounded-full mb-10 w-fit">
+              <Link 
+                href="/sign-up" 
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${mode === 'signup' ? 'bg-white text-black shadow-lg' : 'text-white/40 hover:text-white'}`}
+              >
+                Register
+              </Link>
+              <Link 
+                href="/sign-in" 
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${mode === 'signin' ? 'bg-white text-black shadow-lg' : 'text-white/40 hover:text-white'}`}
+              >
+                Login
+              </Link>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-1">
+                {mode === 'signup' && (
+                <div className="space-y-4 mb-4">
+                    <div className="relative group">
+                        <input
+                            id="name"
+                            type="text"
+                            required
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl h-14 px-6 outline-none focus:border-white/30 focus:bg-white/10 transition-all text-lg placeholder:text-white/20"
+                            placeholder="John Doe"
+                        />
+                        <label className="absolute -top-2 left-4 bg-black px-2 text-[10px] uppercase tracking-widest text-white/40 group-focus-within:text-white transition-colors">
+                            Username
+                        </label>
+                    </div>
+                </div>
+                )}
+                
+                <div className="relative group mb-4">
+                    <input
+                        id="email"
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl h-14 px-6 outline-none focus:border-white/30 focus:bg-white/10 transition-all text-lg placeholder:text-white/20"
+                        placeholder="email@example.com"
+                    />
+                    <label className="absolute -top-2 left-4 bg-black px-2 text-[10px] uppercase tracking-widest text-white/40 group-focus-within:text-white transition-colors">
+                        Email Address
+                    </label>
+                </div>
+
+                <div className="relative group">
+                    <input
+                        id="password"
+                        type="password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl h-14 px-6 outline-none focus:border-white/30 focus:bg-white/10 transition-all text-lg placeholder:text-white/20"
+                        placeholder="••••••••"
+                    />
+                    <label className="absolute -top-2 left-4 bg-black px-2 text-[10px] uppercase tracking-widest text-white/40 group-focus-within:text-white transition-colors">
+                        Password
+                    </label>
+                </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-white/40 pt-2">
+                <input type="checkbox" className="rounded-md bg-white/5 border-white/10 w-4 h-4 checked:bg-white checked:border-white transition-all appearance-none border cursor-pointer hover:border-white/30" />
+                <span>Remember me</span>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-white text-black h-14 rounded-2xl font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:pointer-events-none mt-4"
+            >
+              {loading ? (
+                  <span className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+              ) : (
+                  <>
+                    <span>{mode === 'signin' ? 'Start your session' : 'Begin your adventure'}</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+              )}
+            </button>
+          </form>
+        </div>
+
+        <footer className="absolute bottom-8 left-8 sm:left-12 lg:left-24 text-[10px] tracking-widest uppercase text-white/20">
+            © {new Date().getFullYear()} Lumi AI Platform.
+        </footer>
+      </div>
+
+      {/* Right Side: Hero Image Container */}
+      <div className="hidden lg:flex flex-1 relative bg-white/5 overflow-hidden justify-center items-center p-12">
+        <div className="absolute inset-0 z-0">
+            <img 
+                src="/images/auth.jpg" 
+                alt="Lumi Auth Hero" 
+                className="w-full h-full object-cover opacity-60 scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-l from-black/80 via-black/20 to-black/80" />
+        </div>
+
+        <div className="relative z-10 max-w-lg text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-black/40 backdrop-blur-3xl mb-8">
+                <span className="text-xs font-bold tracking-[0.2em] uppercase text-white/80">Lumi Premium Experience</span>
+            </div>
+            <h2 className="text-6xl font-hero italic text-white mb-6 leading-tight">
+                Your professional <br />
+                drafting starts <span className="bg-white text-black px-4 rounded-xl rotate-3 inline-block">here</span>
+            </h2>
+            <p className="text-white/60 text-xl leading-relaxed">
+                Discover the best AI-powered legal document generation for your business needs.
+            </p>
+
+            <div className="mt-12 flex flex-wrap justify-center gap-3">
+                {['Contracts', 'Proposals', 'SOWs', 'NDAs'].map((type) => (
+                    <span key={type} className="px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-[10px] uppercase font-bold tracking-widest text-white/40 backdrop-blur-md">
+                        {type}
+                    </span>
+                ))}
+            </div>
+        </div>
+        
+        {/* Floating Tag similar to image */}
+        <div className="absolute top-12 right-12 px-5 py-2.5 rounded-2xl bg-black/60 backdrop-blur-3xl border border-white/10 flex items-center gap-3 shadow-2xl">
+            <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
+            <span className="text-[10px] font-bold tracking-widest uppercase text-white/80">Premium Access Active</span>
+        </div>
       </div>
     </div>
   );

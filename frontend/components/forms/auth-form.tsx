@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import PixelBlast from '@/components/PixelBlast';
+import LiquidChrome from '@/components/LiquidChrome';
+
 
 
 interface AuthFormProps {
@@ -59,14 +60,11 @@ export default function AuthForm({ mode }: AuthFormProps) {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black">
       <div className="absolute inset-0 -z-10">
-        <PixelBlast 
-            variant="square" 
-            pixelSize={4} 
-            color="#8b5cf6" 
-            speed={0.2}
-            patternScale={2}
-            patternDensity={0.6}
-            transparent={true}
+        <LiquidChrome 
+            baseColor={[0.3, 0.1, 0.6]}
+            speed={0.15}
+            amplitude={0.5}
+            interactive={true}
         />
       </div>
       <div className="relative w-full max-w-md space-y-8 rounded-2xl border border-white/10 bg-black/40 p-8 shadow-2xl backdrop-blur-xl">

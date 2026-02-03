@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { Sparkles, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { NoiseBackground } from '@/components/ui/noise-background';
 import Link from 'next/link';
 
 import { toast } from "sonner";
@@ -50,9 +51,9 @@ export default function CreateDocumentPage() {
 
             <div className="text-center mb-10">
                  <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4">
-                    <Sparkles className="w-6 h-6 text-primary" />
+                    <img src="/images/lumi-logo.ico" alt="Lumi" className="w-8 h-8" />
                  </div>
-                 <h1 className="text-3xl font-bold tracking-tight">Create with AI</h1>
+                 <h1 className="text-3xl font-bold tracking-tight">Create with Lumi</h1>
                  <p className="text-muted-foreground mt-2">Transform your messy notes into professional legal documents in seconds.</p>
             </div>
             
@@ -90,19 +91,25 @@ export default function CreateDocumentPage() {
                     <button 
                         type="submit" 
                         disabled={loading}
-                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="w-full relative group overflow-hidden rounded-lg font-medium transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
                     >
-                        {loading ? (
-                            <>
-                                <Sparkles className="w-4 h-4 animate-spin" />
-                                Generating Magic...
-                            </>
-                        ) : (
-                            <>
-                                <Sparkles className="w-4 h-4" />
-                                Generate Document
-                            </>
-                        )}
+                        <NoiseBackground 
+                            className="flex items-center justify-center gap-2 py-3 px-4 text-white"
+                            containerClassName="bg-primary hover:bg-primary/90 border-none rounded-lg"
+                            noiseIntensity={0.3}
+                        >
+                            {loading ? (
+                                <>
+                                    
+                                    Generating Magic...
+                                </>
+                            ) : (
+                                <>
+                                    
+                                    Generate Document
+                                </>
+                            )}
+                        </NoiseBackground>
                     </button>
                 </div>
             </form>

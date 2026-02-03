@@ -1,17 +1,15 @@
 import Link from "next/link";
 import { Sparkles, FileText, ArrowRight } from "lucide-react";
-import LiquidChrome from "@/components/LiquidChrome";
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden text-white">
       <div className="fixed inset-0 -z-10 bg-black">
-        <LiquidChrome 
-            baseColor={[0.1, 0.1, 0.1]}
-            speed={0.1}
-            amplitude={0.6}
-            interactive={true}
-        />
+         <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60"
+            style={{ backgroundImage: 'url("/images/bg.jpg")' }}
+         />
+         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/80" />
       </div>
 
       <header className="px-6 h-16 flex items-center justify-between border-b border-white/10 backdrop-blur-sm">

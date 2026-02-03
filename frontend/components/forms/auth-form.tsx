@@ -218,11 +218,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
             </div>
         </div>
         
-        {/* Floating Tag similar to image */}
-        <div className="absolute top-12 right-12 px-5 py-2.5 rounded-2xl bg-black/60 backdrop-blur-3xl border border-white/10 flex items-center gap-3 shadow-2xl">
-            <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
-            <span className="text-[10px] font-bold tracking-widest uppercase text-white/80">Premium Access Active</span>
-        </div>
+       
       </div>
     </div>
   );

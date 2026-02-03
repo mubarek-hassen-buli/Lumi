@@ -1,13 +1,19 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FileText, ArrowRight } from "lucide-react";
+import localFont from 'next/font/local';
+
+const balenia = localFont({
+  src: '../public/fonts/Balenia-Regular.otf',
+  display: 'swap',
+});
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden text-white">
       <div className="fixed inset-0 -z-10 bg-black">
          <Image
-            src="/images/bg.jpg"
+            src="/images/bg-2.jpg"
             alt="Background"
             fill
             className="object-cover opacity-60"
@@ -43,8 +49,8 @@ export default function Home() {
               AI-Powered Legal Documents
             </span>
           </div>
-          <h1 className="text-5xl md:text-8xl font-hero mb-8 leading-[1.1] tracking-tight text-white drop-shadow-2xl">
-            Turn messy notes into <br />
+          <h1 className={`${balenia.className} text-4xl md:text-6xl mb-8 leading-[1.2] tracking-tight text-white drop-shadow-2xl`}>
+            Turn messy notes into <br className="hidden md:block" />
             professional contracts.
           </h1>
           <p className="text-xl md:text-2xl text-white/70 mb-12 leading-relaxed max-w-2xl mx-auto">

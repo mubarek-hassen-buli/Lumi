@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Lumi",
   description: "AI Document Generator",
+  icons: {
+    icon: "/images/lumi-logo.ico",
+  },
 };
 
 import { Toaster } from "@/components/ui/sonner";

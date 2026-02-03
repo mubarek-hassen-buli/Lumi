@@ -147,45 +147,56 @@ app.patch("/:id", authMiddleware, async (c) => {
   const paramValidation = idParamSchema.safeParse({ id: c.req.param("id") });
   
   if (!paramValidation.success) {
+    logger.warn({ id: c.req.param("id"), errors: paramValidation.error.issues }, 'Invalid ID format for update');
     return c.json({ error: "Invalid ID format" }, 400);
   }
   
   const id = paramValidation.data.id;
   
-  // Validate request body
-  const body = await c.req.json();
-  const validated = updateDocSchema.safeParse(body);
-  
-  if (!validated.success) {
-    return c.json({ 
-      error: "Validation failed", 
-      details: validated.error.issues 
-    }, 400);
+  try {
+    // Validate request body
+    const body = await c.req.json();
+    const validated = updateDocSchema.safeParse(body);
+    
+    if (!validated.success) {
+        logger.warn({ 
+            id, 
+            errors: validated.error.issues,
+            body 
+        }, 'Document update validation failed');
+        return c.json({ 
+            error: "Validation failed", 
+            details: validated.error.issues 
+        }, 400);
+    }
+    
+    // Check ownership
+    const [doc] = await db.select()
+        .from(document)
+        .where(eq(document.id, id));
+    
+    if (!doc) {
+        return c.json({ error: "Document not found" }, 404);
+    }
+    
+    if (doc.userId !== user.id) {
+        return c.json({ error: "Unauthorized" }, 403);
+    }
+    
+    // Update document
+    const [updated] = await db.update(document)
+        .set({
+            ...validated.data,
+            updatedAt: new Date(),
+        })
+        .where(eq(document.id, id))
+        .returning();
+    
+    return c.json(updated);
+  } catch (error) {
+    logger.error({ error, docId: id }, 'Failed to parse JSON or update document');
+    return c.json({ error: "Invalid JSON body or update failed" }, 400);
   }
-  
-  // Check ownership
-  const [doc] = await db.select()
-    .from(document)
-    .where(eq(document.id, id));
-  
-  if (!doc) {
-    return c.json({ error: "Document not found" }, 404);
-  }
-  
-  if (doc.userId !== user.id) {
-    return c.json({ error: "Unauthorized" }, 403);
-  }
-  
-  // Update document
-  const [updated] = await db.update(document)
-    .set({
-      ...validated.data,
-      updatedAt: new Date(),
-    })
-    .where(eq(document.id, id))
-    .returning();
-  
-  return c.json(updated);
 });
 
 export default app;

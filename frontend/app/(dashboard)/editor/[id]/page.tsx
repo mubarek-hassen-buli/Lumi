@@ -43,7 +43,7 @@ export default function EditorPage() {
         mutationFn: async (newContent: string) => {
             const { error } = await api(`/api/documents/${id}`, {
                 method: 'PATCH',
-                body: JSON.stringify({ generatedContent: newContent }),
+                body: { generatedContent: newContent },
             });
             if (error) throw error;
         },

@@ -77,7 +77,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
         <div className="max-w-md w-full mx-auto lg:mx-0">
           <div className="mb-12">
             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-8 shadow-2xl">
-                <Sparkles className="w-6 h-6 text-black" />
+                <img src="/images/lumi-logo.ico" alt="Lumi" className="w-7 h-7" />
             </div>
             <h1 className="text-4xl md:text-5xl font-hero italic mb-3 tracking-tight">
               {mode === 'signin' ? 'Welcome Back' : 'Join Lumi'}

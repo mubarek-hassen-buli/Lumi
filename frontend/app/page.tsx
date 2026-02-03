@@ -19,7 +19,7 @@ export default function Home() {
 
       <header className="px-6 h-16 flex items-center justify-between border-b border-white/10 backdrop-blur-sm">
         <div className="flex items-center gap-2 font-bold text-xl">
-          <Sparkles className="w-5 h-5 text-white" />
+          <img src="/images/lumi-logo.ico" alt="Lumi" className="w-6 h-6" />
           <span className="text-white">Lumi</span>
         </div>
 
@@ -96,7 +96,7 @@ export default function Home() {
                     </div>
                     <div className="bg-white/5 p-8 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl hover:bg-white/10 transition-all group">
                          <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform">
-                             <Sparkles className="w-6 h-6" />
+                             <img src="/images/lumi-logo.ico" alt="Lumi" className="w-6 h-6" />
                          </div>
                         <h3 className="font-bold text-2xl mb-3 text-white">Smart Formatting</h3>
                         <p className="text-white/50 leading-relaxed">Automatically adheres to legal structures, tone, and standard clauses.</p>

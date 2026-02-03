@@ -1,13 +1,18 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Sparkles, FileText, ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden text-white">
       <div className="fixed inset-0 -z-10 bg-black">
-         <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60"
-            style={{ backgroundImage: 'url("/images/bg.jpg")' }}
+         <Image
+            src="/images/bg.jpg"
+            alt="Background"
+            fill
+            className="object-cover opacity-60"
+            priority
+            quality={75}
          />
          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/80" />
       </div>

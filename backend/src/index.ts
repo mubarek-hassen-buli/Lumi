@@ -2,6 +2,7 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
+import { apiLimiter } from './middlewares/rate-limit.middleware'
 
 const app = new Hono()
 
@@ -9,7 +10,9 @@ app.use('*', logger())
 app.use(
   '*',
   cors({
-    origin: ["http://localhost:3000"], // Explicitly allow Frontend
+    origin: process.env.NODE_ENV === 'production'
+      ? [process.env.FRONTEND_URL!]
+      : ["http://localhost:3000"], // Explicitly allow Frontend
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "OPTIONS", "DELETE", "PATCH"],
     exposeHeaders: ["Content-Length"],
@@ -17,6 +20,9 @@ app.use(
     credentials: true, // Required for BetterAuth cookies
   })
 )
+
+// Apply rate limiting to all API routes
+app.use('/api/*', apiLimiter)
 
 app.get('/', (c) => {
   return c.text('Hello Hono!')

@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import Link from 'next/link';
 import { File, Plus, FileText, Calendar, Trash2 } from 'lucide-react';
@@ -10,27 +10,51 @@ import { toast } from "sonner";
 export default function DashboardPage() {
     const queryClient = useQueryClient();
 
-    const { data: documents, isLoading } = useQuery({
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+    } = useInfiniteQuery({
         queryKey: ['documents'],
-        queryFn: async () => {
-             const { data } = await api<any[]>("/api/documents");
-             return data;
-        }
+        queryFn: async ({ pageParam = 0 }) => {
+            const { data } = await api<any>(`/api/documents?cursor=${pageParam}`);
+            return data;
+        },
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+        initialPageParam: 0,
     });
+
+    const documents = data?.pages.flatMap(page => page.items) ?? [];
 
     const deleteMutation = useMutation({
         mutationFn: async (id: number) => {
             const { error } = await api(`/api/documents/${id}`, { method: 'DELETE' });
             if (error) throw error;
         },
+        onMutate: async (deletedId) => {
+            await queryClient.cancelQueries({ queryKey: ['documents'] });
+            
+            const previousDocs = queryClient.getQueryData(['documents']);
+            
+            queryClient.setQueryData(['documents'], (old: any) => ({
+                ...old,
+                pages: old.pages.map((page: any) => ({
+                    ...page,
+                    items: page.items.filter((doc: any) => doc.id !== deletedId),
+                })),
+            }));
+            
+            return { previousDocs };
+        },
+        onError: (err, deletedId, context) => {
+            queryClient.setQueryData(['documents'], context?.previousDocs);
+            toast.error("Failed to delete document. Please try again.");
+        },
         onSuccess: () => {
             toast.success("Document deleted successfully");
-            queryClient.invalidateQueries({ queryKey: ['documents'] });
         },
-        onError: (error) => {
-            console.error("Failed to delete document:", error);
-            toast.error("Failed to delete document. Please try again.");
-        }
     });
 
     const handleDelete = (e: React.MouseEvent, id: number, title: string) => {
@@ -131,6 +155,19 @@ export default function DashboardPage() {
                             </Link>
                         </div>
                     )}
+                </div>
+            )}
+
+            {/* Load More Button */}
+            {hasNextPage && (
+                <div className="flex justify-center mt-8">
+                    <button
+                        onClick={() => fetchNextPage()}
+                        disabled={isFetchingNextPage}
+                        className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isFetchingNextPage ? 'Loading...' : 'Load More'}
+                    </button>
                 </div>
             )}
         </div>

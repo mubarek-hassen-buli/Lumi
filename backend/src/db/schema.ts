@@ -1,5 +1,5 @@
 // Core schema definition
-import { pgTable, text, serial, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, boolean, index } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -20,7 +20,10 @@ export const session = pgTable("session", {
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
   userId: text("user_id").notNull().references(() => user.id),
-});
+}, (table) => ({
+  userIdIdx: index("session_user_id_idx").on(table.userId),
+  tokenIdx: index("session_token_idx").on(table.token),
+}));
 
 export const account = pgTable("account", {
   id: text("id").primaryKey(),
@@ -57,4 +60,8 @@ export const document = pgTable("document", {
   status: text("status").notNull().default("draft"), // 'draft', 'completed'
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  userIdIdx: index("document_user_id_idx").on(table.userId),
+  createdAtIdx: index("document_created_at_idx").on(table.createdAt),
+  userIdCreatedAtIdx: index("document_user_created_idx").on(table.userId, table.createdAt),
+}));

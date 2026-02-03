@@ -8,20 +8,19 @@ import { ArrowLeft, Download, FileJson, FileText } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
+import { UserNav } from '@/components/user-nav';
+
+import { useEditorStore } from '@/store/editor-store';
+import { useUIStore } from '@/store/ui-store';
 
 export default function EditorPage() {
     const params = useParams();
     const router = useRouter();
+    const queryClient = useQueryClient();
     const id = params?.id as string;
-    const [isSaving, setIsSaving] = useState(false);
-
-    const handleSave = async () => {
-        setIsSaving(true);
-        // Simulate save
-        await new Promise(resolve => setTimeout(resolve, 800));
-        setIsSaving(false);
-        toast.success("Changes saved successfully");
-    };
+    
+    const { content, setContent, isSaving, setSaving, markSaved } = useEditorStore();
+    const { autoSave } = useUIStore();
 
     const { data: doc, isLoading } = useQuery({
         queryKey: ['document', id],
@@ -29,12 +28,52 @@ export default function EditorPage() {
             const { data } = await api<any>(`/api/documents/${id}`);
             return data;
         },
-        enabled: !!id
+        enabled: !!id,
     });
+
+    // Initialize content from doc
+    useEffect(() => {
+        if (doc?.generatedContent && !content) {
+            setContent(doc.generatedContent);
+        }
+    }, [doc, setContent, content]);
+
+    // Update Mutation
+    const updateMutation = useMutation({
+        mutationFn: async (newContent: string) => {
+            const { error } = await api(`/api/documents/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ generatedContent: newContent }),
+            });
+            if (error) throw error;
+        },
+        onMutate: () => setSaving(true),
+        onSuccess: () => {
+            markSaved();
+            toast.success("Changes saved");
+        },
+        onError: () => {
+            setSaving(false);
+            toast.error("Failed to save changes");
+        }
+    });
+
+    // Debounced Save
+    const debouncedContent = useDebounce(content, 2000);
+
+    useEffect(() => {
+        if (debouncedContent && doc && debouncedContent !== doc.generatedContent && autoSave) {
+            updateMutation.mutate(debouncedContent);
+        }
+    }, [debouncedContent, autoSave]);
+
+    const handleSave = () => {
+        updateMutation.mutate(content);
+    };
 
     const handleDownloadMarkdown = () => {
         if (!doc) return;
-        const blob = new Blob([doc.generatedContent || doc.originalContent], { type: 'text/markdown' });
+        const blob = new Blob([content || doc.generatedContent || doc.originalContent], { type: 'text/markdown' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -100,15 +139,16 @@ export default function EditorPage() {
                     >
                         {isSaving ? 'Saving...' : 'Save Changes'}
                     </button>
+                    <UserNav />
                 </div>
             </div>
             
             {/* Editor Area */}
             <div className="bg-card rounded-lg shadow-sm border min-h-[600px]">
                 <TiptapEditor 
-                    content={doc.generatedContent || doc.originalContent} 
+                    content={content || doc.generatedContent || doc.originalContent} 
                     onChange={(newContent) => {
-                        // Debounce autosave logic would go here
+                        setContent(newContent);
                     }} 
                 />
             </div>

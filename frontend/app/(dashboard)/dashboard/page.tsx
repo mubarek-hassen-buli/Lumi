@@ -6,9 +6,12 @@ import Link from 'next/link';
 import { File, Plus, FileText, Calendar, Trash2 } from 'lucide-react';
 
 import { toast } from "sonner";
+import { useUserStore } from '@/store/user-store';
+import { UserNav } from '@/components/user-nav';
 
 export default function DashboardPage() {
     const queryClient = useQueryClient();
+    const { user } = useUserStore();
 
     const {
         data,
@@ -78,16 +81,21 @@ export default function DashboardPage() {
         <div className="container mx-auto py-10 px-4">
             <div className="flex justify-between items-center mb-10">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Documents</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">
+                        {user ? `Welcome back, ${user.name}` : 'Documents'}
+                    </h1>
                     <p className="text-muted-foreground mt-1">Manage and create your legal documents.</p>
                 </div>
-                <Link 
-                    href="/create" 
-                    className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2.5 rounded-md font-medium transition-all shadow-sm"
-                >
-                    <Plus className="w-4 h-4" />
-                    New Document
-                </Link>
+                <div className="flex items-center gap-4">
+                    <Link 
+                        href="/create" 
+                        className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2.5 rounded-md font-medium transition-all shadow-sm"
+                    >
+                        <Plus className="w-4 h-4" />
+                        New Document
+                    </Link>
+                    <UserNav />
+                </div>
             </div>
 
             {isLoading ? (

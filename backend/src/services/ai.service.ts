@@ -30,8 +30,10 @@ export const generateDocument = async (content: string, type: string) => {
       ${structure}
       
       STYLE RULES:
-      - Use clean, professional Markdown headers (##, ###).
-      - Use bolding for emphasis on key terms.
+      - Use clean, professional Markdown headers (## for sections).
+      - Use H1 (#) ONLY for the main document title.
+      - Use bolding (**text**) for defined terms, key obligations, or emphasis.
+      - Use italics (*text*) for lighter emphasis or legal citations.
       - Maintain a formal, authoritative tone.
       - Ensure all standard sections (like Preamble or Signature Blocks) are included.
       - If the user provides specific names or dates, integrate them seamlessly.` }]

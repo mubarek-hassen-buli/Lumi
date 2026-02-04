@@ -3,11 +3,18 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import Link from 'next/link';
-import { File, Plus, FileText, Calendar, Trash2 } from 'lucide-react';
+import { File, Plus, FileText, Calendar, Trash2, Download, MoreVertical } from 'lucide-react';
 
 import { toast } from "sonner";
 import { useUserStore } from '@/store/user-store';
 import { UserNav } from '@/components/user-nav';
+import { exportToDocx } from '@/lib/export-utils';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function DashboardPage() {
     const queryClient = useQueryClient();
@@ -77,8 +84,38 @@ export default function DashboardPage() {
         });
     };
 
+    const handleDownloadMarkdown = (doc: any) => {
+        const blob = new Blob([doc.generatedContent || doc.originalContent], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${doc.title}.md`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    const handleDownloadDocx = async (doc: any) => {
+        const toastId = toast.loading("Generating Word document...");
+        try {
+            // Note: Dashboard doesn't have live HTML, so we export based on generatedContent
+            // In a real app, you might want a Markdown-to-HTML converter here or a backend endpoint.
+            // For now, we'll wrap the content in basic tags or use a simple converter.
+            const simpleHtml = (doc.generatedContent || doc.originalContent)
+                .split('\n')
+                .map((line: string) => `<p>${line}</p>`)
+                .join('');
+            await exportToDocx(simpleHtml, doc.title);
+            toast.success("DOCX exported", { id: toastId });
+        } catch (error) {
+            toast.error("Failed to export DOCX", { id: toastId });
+        }
+    };
+
     return (
         <div className="container mx-auto py-10 px-4">
+            {/* ... header ... */}
             <div className="flex justify-between items-center mb-10">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">
@@ -107,43 +144,61 @@ export default function DashboardPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {documents?.map((doc: any) => (
-                        <Link 
+                        <div 
                             key={doc.id} 
-                            href={`/editor/${doc.id}`} 
                             className="group block border rounded-xl p-6 bg-card hover:shadow-md transition-all hover:border-primary/50 relative overflow-hidden"
                         >
                              <div className="flex justify-between items-start mb-4">
-                                <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                                <Link href={`/editor/${doc.id}`} className="p-2 bg-primary/10 rounded-lg text-primary">
                                     <FileText className="w-6 h-6" />
-                                </div>
+                                </Link>
                                 <div className="flex items-center gap-2">
                                     <span className="text-xs font-medium px-2 py-1 bg-muted rounded-full capitalize">
                                         {doc.type}
                                     </span>
-                                    <button
-                                        onClick={(e) => handleDelete(e, doc.id, doc.title)}
-                                        disabled={deleteMutation.isPending}
-                                        className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
-                                        title="Delete document"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
+                                    
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors">
+                                                <MoreVertical className="w-4 h-4" />
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onClick={() => handleDownloadMarkdown(doc)}>
+                                                <Download className="w-4 h-4 mr-2" />
+                                                Markdown (.md)
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleDownloadDocx(doc)}>
+                                                <Download className="w-4 h-4 mr-2" />
+                                                Word (.docx)
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem 
+                                                onClick={(e) => handleDelete(e as any, doc.id, doc.title)}
+                                                className="text-destructive focus:text-destructive"
+                                            >
+                                                <Trash2 className="w-4 h-4 mr-2" />
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
                              </div>
                              
-                             <h3 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors line-clamp-1">
-                                {doc.title}
-                             </h3>
-                             
-                             <div className="flex items-center gap-2 text-xs text-muted-foreground mt-4">
-                                <Calendar className="w-3 h-3" />
-                                {new Date(doc.createdAt).toLocaleDateString(undefined, {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric'
-                                })}
-                             </div>
-                        </Link>
+                             <Link href={`/editor/${doc.id}`}>
+                                <h3 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors line-clamp-1">
+                                    {doc.title}
+                                </h3>
+                                
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-4">
+                                    <Calendar className="w-3 h-3" />
+                                    {new Date(doc.createdAt).toLocaleDateString(undefined, {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })}
+                                </div>
+                             </Link>
+                        </div>
                     ))}
                     
                     {documents?.length === 0 && (

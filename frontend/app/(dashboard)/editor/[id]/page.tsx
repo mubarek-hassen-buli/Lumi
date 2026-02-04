@@ -12,6 +12,13 @@ import { UserNav } from '@/components/user-nav';
 
 import { useEditorStore } from '@/store/editor-store';
 import { useUIStore } from '@/store/ui-store';
+import { exportToPdf, exportToDocx } from '@/lib/export-utils';
+import { 
+    DropdownMenu, 
+    DropdownMenuContent, 
+    DropdownMenuItem, 
+    DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
 
 export default function EditorPage() {
     const params = useParams();
@@ -21,6 +28,7 @@ export default function EditorPage() {
     
     const { content, setContent, isSaving, setSaving, markSaved } = useEditorStore();
     const { autoSave } = useUIStore();
+    const [htmlContent, setHtmlContent] = useState('');
 
     const { data: doc, isLoading } = useQuery({
         queryKey: ['document', id],
@@ -84,6 +92,28 @@ export default function EditorPage() {
         URL.revokeObjectURL(url);
     };
 
+    const handleDownloadPdf = async () => {
+        if (!doc) return;
+        const toastId = toast.loading("Generating PDF...");
+        try {
+            await exportToPdf('tiptap-wrapper', doc.title);
+            toast.success("PDF exported", { id: toastId });
+        } catch (error) {
+            toast.error("Failed to export PDF", { id: toastId });
+        }
+    };
+
+    const handleDownloadDocx = async () => {
+        if (!doc) return;
+        const toastId = toast.loading("Generating Word document...");
+        try {
+            await exportToDocx(htmlContent, doc.title);
+            toast.success("DOCX exported", { id: toastId });
+        } catch (error) {
+            toast.error("Failed to export DOCX", { id: toastId });
+        }
+    };
+
     if (isLoading) return (
         <div className="flex items-center justify-center min-h-screen text-muted-foreground">
             Loading editor...
@@ -125,13 +155,29 @@ export default function EditorPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <button 
-                        onClick={handleDownloadMarkdown}
-                        className="flex items-center gap-2 px-3 py-2 text-sm border rounded-md hover:bg-accent transition-colors"
-                    >
-                        <FileText className="w-4 h-4" />
-                        Export MD
-                    </button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="flex items-center gap-2 px-3 py-2 text-sm border rounded-md hover:bg-accent transition-colors">
+                                <Download className="w-4 h-4" />
+                                Export
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={handleDownloadMarkdown}>
+                                <FileText className="w-4 h-4 mr-2" />
+                                Markdown (.md)
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={handleDownloadPdf}>
+                                <FileText className="w-4 h-4 mr-2" />
+                                PDF Document (.pdf)
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={handleDownloadDocx}>
+                                <FileText className="w-4 h-4 mr-2" />
+                                Word Document (.docx)
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
                     <button 
                         onClick={handleSave}
                         disabled={isSaving}
@@ -144,12 +190,15 @@ export default function EditorPage() {
             </div>
             
             {/* Editor Area */}
-            <div className="bg-card rounded-lg shadow-sm border min-h-[600px]">
+            <div id="tiptap-wrapper" className="bg-card rounded-lg shadow-sm border min-h-[600px]">
                 <TiptapEditor 
                     content={content || doc.generatedContent || doc.originalContent} 
                     onChange={(newContent) => {
                         setContent(newContent);
-                    }} 
+                    }}
+                    onHtmlChange={(html) => {
+                        setHtmlContent(html);
+                    }}
                 />
             </div>
         </div>

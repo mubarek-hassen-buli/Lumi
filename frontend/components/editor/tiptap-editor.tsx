@@ -3,8 +3,13 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { Markdown } from 'tiptap-markdown'
+import { useEffect } from 'react'
 
-const TiptapEditor = ({ content, onChange }: { content: string, onChange?: (c: string) => void }) => {
+const TiptapEditor = ({ content, onChange, onHtmlChange }: { 
+    content: string, 
+    onChange?: (c: string) => void,
+    onHtmlChange?: (h: string) => void
+}) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -14,6 +19,7 @@ const TiptapEditor = ({ content, onChange }: { content: string, onChange?: (c: s
     content: content,
     onUpdate: ({ editor }) => {
         onChange?.((editor.storage as any).markdown.getMarkdown()) 
+        onHtmlChange?.(editor.getHTML())
     },
     editorProps: {
         attributes: {
@@ -21,6 +27,13 @@ const TiptapEditor = ({ content, onChange }: { content: string, onChange?: (c: s
         }
     }
   })
+
+  // Synchronize initial HTML content
+  useEffect(() => {
+    if (editor && !editor.isDestroyed) {
+        onHtmlChange?.(editor.getHTML());
+    }
+  }, [editor, onHtmlChange]);
 
   if (!editor) {
     return null

@@ -24,6 +24,36 @@ export const exportToPdf = async (elementId: string, fileName: string) => {
             scale: 2, // Higher resolution
             useCORS: true,
             logging: false,
+            onclone: (clonedDoc) => {
+                // html2canvas crashes on modern CSS color functions like oklch() and lab() 
+                // which Tailwind 4 uses by default. We inject a compatibility stylesheet
+                // to override these with standard HEX/RGB equivalents for the capture.
+                const style = clonedDoc.createElement('style');
+                style.innerHTML = `
+                    :root {
+                        --background: #ffffff !important;
+                        --foreground: #1a1a1a !important;
+                        --primary: #2563eb !important;
+                        --muted: #f3f4f6 !important;
+                        --muted-foreground: #6b7280 !important;
+                        --border: #e5e7eb !important;
+                        --accent: #2563eb !important;
+                    }
+                    /* Ensure all elements using these variables get the overrides */
+                    * {
+                        border-color: var(--border) !important;
+                        color: var(--foreground);
+                    }
+                    h1, h2, h3, h4, h5, h6, strong, b {
+                        color: var(--foreground) !important;
+                    }
+                    blockquote {
+                        border-left-color: var(--primary) !important;
+                        background-color: var(--muted) !important;
+                    }
+                `;
+                clonedDoc.head.appendChild(style);
+            }
         });
 
         const imgData = canvas.toDataURL('image/png');

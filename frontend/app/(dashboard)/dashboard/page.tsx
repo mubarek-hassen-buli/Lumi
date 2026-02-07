@@ -146,58 +146,69 @@ export default function DashboardPage() {
                     {documents?.map((doc: any) => (
                         <div 
                             key={doc.id} 
-                            className="group block border rounded-xl p-6 bg-card hover:shadow-md transition-all hover:border-primary/50 relative overflow-hidden"
+                            className="group relative border rounded-xl p-6 bg-card hover:shadow-md transition-all hover:border-primary/50 overflow-hidden"
                         >
-                             <div className="flex justify-between items-start mb-4">
-                                <Link href={`/editor/${doc.id}`} className="p-2 bg-primary/10 rounded-lg text-primary">
-                                    <FileText className="w-6 h-6" />
-                                </Link>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs font-medium px-2 py-1 bg-muted rounded-full capitalize">
-                                        {doc.type}
-                                    </span>
+                             {/* Stretched Link - Makes the entire card clickable */}
+                             <Link 
+                                href={`/editor/${doc.id}`} 
+                                className="absolute inset-0 z-0"
+                             >
+                                <span className="sr-only">Edit {doc.title}</span>
+                             </Link>
+
+                             {/* Card Content - Wrapped in relative z-10 so it sits above the link background */}
+                             <div className="relative z-10 pointer-events-none flex flex-col h-full">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                                        <FileText className="w-6 h-6" />
+                                    </div>
+                                    <div className="flex items-center gap-2 pointer-events-auto">
+                                        <span className="text-xs font-medium px-2 py-1 bg-muted rounded-full capitalize">
+                                            {doc.type}
+                                        </span>
+                                        
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <button className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors relative z-20">
+                                                    <MoreVertical className="w-4 h-4" />
+                                                </button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onClick={() => handleDownloadMarkdown(doc)}>
+                                                    <Download className="w-4 h-4 mr-2" />
+                                                    Markdown (.md)
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleDownloadDocx(doc)}>
+                                                    <Download className="w-4 h-4 mr-2" />
+                                                    Word (.docx)
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    onClick={(e) => handleDelete(e as any, doc.id, doc.title)}
+                                                    className="text-destructive focus:text-destructive"
+                                                >
+                                                    <Trash2 className="w-4 h-4 mr-2" />
+                                                    Delete
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h3 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors line-clamp-1">
+                                        {doc.title}
+                                    </h3>
                                     
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <button className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors">
-                                                <MoreVertical className="w-4 h-4" />
-                                            </button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => handleDownloadMarkdown(doc)}>
-                                                <Download className="w-4 h-4 mr-2" />
-                                                Markdown (.md)
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleDownloadDocx(doc)}>
-                                                <Download className="w-4 h-4 mr-2" />
-                                                Word (.docx)
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem 
-                                                onClick={(e) => handleDelete(e as any, doc.id, doc.title)}
-                                                className="text-destructive focus:text-destructive"
-                                            >
-                                                <Trash2 className="w-4 h-4 mr-2" />
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-4">
+                                        <Calendar className="w-3 h-3" />
+                                        {new Date(doc.createdAt).toLocaleDateString(undefined, {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric'
+                                        })}
+                                    </div>
                                 </div>
                              </div>
-                             
-                             <Link href={`/editor/${doc.id}`}>
-                                <h3 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors line-clamp-1">
-                                    {doc.title}
-                                </h3>
-                                
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-4">
-                                    <Calendar className="w-3 h-3" />
-                                    {new Date(doc.createdAt).toLocaleDateString(undefined, {
-                                        year: 'numeric',
-                                        month: 'short',
-                                        day: 'numeric'
-                                    })}
-                                </div>
-                             </Link>
                         </div>
                     ))}
                     

@@ -38,10 +38,25 @@ app.get('/health', (c) => {
   return c.json({ status: 'ok', uptime: process.uptime() })
 })
 
-const port = Number(process.env.PORT) || 4000
-console.log(`Server is running on port ${port}`)
+import { handle } from 'hono/vercel'
 
-serve({
-  fetch: app.fetch,
-  port
-})
+// ... existing code ...
+
+const isVercel = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production'
+
+if (!isVercel) {
+  const port = Number(process.env.PORT) || 4000
+  console.log(`Server is running on port ${port}`)
+  serve({
+    fetch: app.fetch,
+    port
+  })
+}
+
+export const GET = handle(app)
+export const POST = handle(app)
+export const PUT = handle(app)
+export const DELETE = handle(app)
+export const PATCH = handle(app)
+export const OPTIONS = handle(app)
+export default handle(app)

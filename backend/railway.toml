@@ -1,0 +1,14 @@
+# Railway Configuration for Lumi Backend
+# This file ensures Railway knows how to build and start the backend service in a monorepo structure.
+
+[build]
+builder = "RAILPACK"
+buildCommand = "npm run build"
+watchPatterns = ["src/**", "package.json", "tsconfig.json"]
+
+[deploy]
+startCommand = "npm run start"
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+numReplicas = 1

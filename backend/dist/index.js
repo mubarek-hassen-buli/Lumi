@@ -1,21 +1,15 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.OPTIONS = exports.PATCH = exports.DELETE = exports.PUT = exports.POST = exports.GET = void 0;
-const node_server_1 = require("@hono/node-server");
-const hono_1 = require("hono");
-const logger_1 = require("hono/logger");
-const cors_1 = require("hono/cors");
-const rate_limit_middleware_1 = require("./middlewares/rate-limit.middleware");
-const app = new hono_1.Hono();
+import { serve } from '@hono/node-server';
+import { Hono } from 'hono';
+import { logger } from 'hono/logger';
+import { cors } from 'hono/cors';
+import { apiLimiter } from './middlewares/rate-limit.middleware';
+const app = new Hono();
 app.onError((err, c) => {
     console.error('❌ Global Error:', err);
     return c.json({ error: 'Internal Server Error', message: err.message }, 500);
 });
-app.use('*', (0, logger_1.logger)());
-app.use('*', (0, cors_1.cors)({
+app.use('*', logger());
+app.use('*', cors({
     origin: (origin) => {
         const frontendUrl = process.env.FRONTEND_URL;
         // Allow unrestricted access in development
@@ -43,32 +37,32 @@ app.use('*', (0, cors_1.cors)({
 // Explicit OPTIONS handler for preflight checks
 app.options('*', (c) => c.body(null, 204));
 // Apply rate limiting to all API routes
-app.use('/api/*', rate_limit_middleware_1.apiLimiter);
+app.use('/api/*', apiLimiter);
 app.get('/', (c) => {
     return c.text('Hello Hono!');
 });
-const auth_controller_1 = __importDefault(require("./controllers/auth.controller"));
-const document_controller_1 = __importDefault(require("./controllers/document.controller"));
-app.route('/api/auth', auth_controller_1.default); // Correcting path to be more explicit if needed, but keeping consistent with auth controller's internal routing
-app.route('/api/documents', document_controller_1.default);
+import authController from './controllers/auth.controller';
+import documentController from './controllers/document.controller';
+app.route('/api/auth', authController); // Correcting path to be more explicit if needed, but keeping consistent with auth controller's internal routing
+app.route('/api/documents', documentController);
 app.get('/health', (c) => {
     return c.json({ status: 'ok', uptime: process.uptime() });
 });
-const vercel_1 = require("hono/vercel");
+import { handle } from 'hono/vercel';
 // ... existing code ...
 const isVercel = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
 if (!isVercel) {
     const port = Number(process.env.PORT) || 4000;
     console.log(`Server is running on port ${port}`);
-    (0, node_server_1.serve)({
+    serve({
         fetch: app.fetch,
         port
     });
 }
-exports.GET = (0, vercel_1.handle)(app);
-exports.POST = (0, vercel_1.handle)(app);
-exports.PUT = (0, vercel_1.handle)(app);
-exports.DELETE = (0, vercel_1.handle)(app);
-exports.PATCH = (0, vercel_1.handle)(app);
-exports.OPTIONS = (0, vercel_1.handle)(app);
-exports.default = (0, vercel_1.handle)(app);
+export const GET = handle(app);
+export const POST = handle(app);
+export const PUT = handle(app);
+export const DELETE = handle(app);
+export const PATCH = handle(app);
+export const OPTIONS = handle(app);
+export default handle(app);

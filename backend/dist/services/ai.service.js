@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateDocument = void 0;
-const generative_ai_1 = require("@google/generative-ai");
-const genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 // Sanitize user input to prevent prompt injection
 const sanitizeInput = (input) => {
     return input
@@ -15,7 +12,7 @@ const STRUCTURES = {
     proposal: "Business persuasion: Executive Summary, Situation Analysis, Proposed Solution/Services, Benefits and Value Proposition, Implementation Timeline, Investment/Pricing breakdown, Experience/Qualifications, and clear Call to Action/Next Steps.",
     sow: "Project operational: Project Overview, Detailed Scope of Work, Technical Requirements, Milestones and Deliverables, Project Schedule, Resource Requirements, Reporting and Communication, and specific Assumptions/Constraints."
 };
-const generateDocument = async (content, type) => {
+export const generateDocument = async (content, type) => {
     const structure = STRUCTURES[type] || "Professional document structure.";
     const model = genAI.getGenerativeModel({
         model: "gemini-2.5-flash",
@@ -38,8 +35,8 @@ const generateDocument = async (content, type) => {
         },
         safetySettings: [
             {
-                category: generative_ai_1.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                threshold: generative_ai_1.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
             },
         ],
     });
@@ -56,4 +53,3 @@ const generateDocument = async (content, type) => {
     const result = await model.generateContent(prompt);
     return result.response.text();
 };
-exports.generateDocument = generateDocument;

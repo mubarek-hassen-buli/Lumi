@@ -1,12 +1,12 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const hono_1 = require("hono");
-const auth_1 = require("../config/auth");
-const app = new hono_1.Hono();
+import { Hono } from "hono";
+import { auth } from "../config/auth";
+const app = new Hono();
+// Handle OPTIONS preflight requests
+app.options("/*", (c) => c.body(null, 204));
 app.get("/*", (c) => {
-    return auth_1.auth.handler(c.req.raw);
+    return auth.handler(c.req.raw);
 });
 app.post("/*", (c) => {
-    return auth_1.auth.handler(c.req.raw);
+    return auth.handler(c.req.raw);
 });
-exports.default = app;
+export default app;

@@ -15,16 +15,38 @@ app.use('*', logger())
 app.use(
   '*',
   cors({
-    origin: process.env.NODE_ENV === 'production'
-      ? [process.env.FRONTEND_URL!]
-      : ["http://localhost:3000"], // Explicitly allow Frontend
+    origin: (origin) => {
+      const frontendUrl = process.env.FRONTEND_URL;
+      
+      // Allow unrestricted access in development
+      if (process.env.NODE_ENV !== 'production') {
+        return origin;
+      }
+
+      // In production, strictly match the FRONTEND_URL
+      if (!frontendUrl) {
+         console.error("❌ FRONTEND_URL is not set in environment variables!");
+         return origin; // Fallback: allow to prevent crash, but log error
+      }
+
+      // Check if origin matches or if it's a Vercel preview deployment
+      if (origin === frontendUrl || origin.endsWith('.vercel.app')) {
+        return origin;
+      }
+      
+      console.warn(`⚠️ Blocked CORS request from: ${origin}, expected: ${frontendUrl}`);
+      return frontendUrl;
+    },
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "OPTIONS", "DELETE", "PATCH"],
     exposeHeaders: ["Content-Length"],
     maxAge: 600,
-    credentials: true, // Required for BetterAuth cookies
+    credentials: true,
   })
 )
+
+// Explicit OPTIONS handler for preflight checks
+app.options('*', (c) => c.body(null, 204))
 
 // Apply rate limiting to all API routes
 app.use('/api/*', apiLimiter)

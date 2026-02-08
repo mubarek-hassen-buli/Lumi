@@ -6,6 +6,11 @@ import { apiLimiter } from './middlewares/rate-limit.middleware'
 
 const app = new Hono()
 
+app.onError((err, c) => {
+  console.error('❌ Global Error:', err)
+  return c.json({ error: 'Internal Server Error', message: err.message }, 500)
+})
+
 app.use('*', logger())
 app.use(
   '*',
